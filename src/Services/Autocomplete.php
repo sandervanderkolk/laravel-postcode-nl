@@ -37,6 +37,7 @@ class Autocomplete
     /**
      * Performs an address lookup.
      *
+     * @param string %sessionToken
      * @param string $context
      * @param string $term
      * @param null|string $language
@@ -46,12 +47,12 @@ class Autocomplete
      * @throws AddressNotFound
      * @throws Unauthorized
      */
-    public function autocomplete(string $context, string $term, string $language = null): Address
+    public function autocomplete(string $sessionToken, string $context, string $term, string $language = null): Address
     {
-        $this->validator->validate(array_filter(compact('context', 'term', 'language')));
+        $this->validator->validate(array_filter(compact('sessionToken','context', 'term', 'language')));
 
         $uri = $this->getUri($context, $term, $language);
-        $response = $this->client->get($uri);
+        $response = $this->client->get($uri, $sessionToken);
         $data = json_decode($response->getBody()->getContents(), true);
         return new Address($data);
     }
@@ -66,6 +67,6 @@ class Autocomplete
      */
     public function getUri(string $context, string $term, string $language = null): string
     {
-        return "https://api.postcode.eu/international/v1/autocomplete/$context/$term/$language";
+        return "https://api.postcode.eu/international/v1/autocomplete/$context/$term";
     }
 }

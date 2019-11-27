@@ -17,6 +17,7 @@ class AutocompleteValidator
      * @var array
      */
     protected $rules = [
+        'sessionToken' => ['required', 'string', 'min:8', 'max:64'],
         'context' => ['required', 'string'],
         'term' => ['required', 'string'],
         'language' => ['sometimes', 'string']

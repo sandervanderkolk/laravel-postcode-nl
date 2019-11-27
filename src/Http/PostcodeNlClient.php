@@ -38,15 +38,16 @@ class PostcodeNlClient
      * Performs a GET request compatible with Postcode.nl.
      *
      * @param string $uri
+     * @param string $sessionToken
      * @return ResponseInterface
      * @throws AccountSuspended
      * @throws AddressNotFound
      * @throws Unauthorized
      */
-    public function get(string $uri): ResponseInterface
+    public function get(string $uri, $sessionToken): ResponseInterface
     {
         try {
-            return $this->client->get($uri, $this->getRequestOptions());
+            return $this->client->get($uri, $this->getRequestOptions($sessionToken));
         } catch (ClientException $e) {
             $this->handleClientException($e);
         }
@@ -54,12 +55,18 @@ class PostcodeNlClient
 
     /**
      * Returns the configured request options.
-     *
+     * @param string $sessionToken
      * @return array
      */
-    protected function getRequestOptions(): array
+    protected function getRequestOptions($sessionToken): array
     {
-        return $this->config->get('postcode-nl.requestOptions');
+        return [
+                'auth' => $this->config->get('postcode-nl.requestOptions.auth'),
+                'headers' => [
+                    'X-Autocomplete-Session' => $sessionToken
+                ],
+                'timeout' => $this->config->get('postcode-nl.requestOptions.timeout')
+            ];
     }
 
     /**
