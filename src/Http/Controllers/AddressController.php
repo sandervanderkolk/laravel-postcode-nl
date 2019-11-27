@@ -9,6 +9,7 @@ use Speelpenning\PostcodeNl\Exceptions\AccountSuspended;
 use Speelpenning\PostcodeNl\Exceptions\AddressNotFound;
 use Speelpenning\PostcodeNl\Exceptions\Unauthorized;
 use Speelpenning\PostcodeNl\Services\AddressLookup;
+use Speelpenning\PostcodeNl\Services\Autocomplete;
 
 class AddressController extends Controller
 {
@@ -18,13 +19,22 @@ class AddressController extends Controller
     protected $lookup;
 
     /**
+     * @var Autocomplete
+     */
+    protected $autocomplete;
+
+
+
+    /**
      * AddressController constructor.
      *
      * @param AddressLookup $lookup
+     * @param Autocomplete $autocomplete
      */
-    public function __construct(AddressLookup $lookup)
+    public function __construct(AddressLookup $lookup, Autocomplete $autocomplete)
     {
         $this->lookup = $lookup;
+        $this->autocomplete = $autocomplete;
     }
 
     /**
@@ -50,4 +60,29 @@ class AddressController extends Controller
             abort(404, 'Not Found');
         }
     }
+
+    /**
+     * Autocompletes address from international API.
+     *
+     * @param string $context
+     * @param string $term
+     * @param null|string $language
+     * @return JsonResponse
+     */
+    public function autocomplete(string $context, string $term, string $language = null): JsonResponse
+    {
+        try {
+            $address = $this->autocomplete->autocomplete($context, $term, $language);
+            return response()->json($address);
+        } catch (ValidationException $e) {
+            abort(400, 'Bad Request');
+        } catch (Unauthorized $e) {
+            abort(401, 'Unauthorized');
+        } catch (AccountSuspended $e) {
+            abort(403, 'Account suspended');
+        } catch (AddressNotFound $e) {
+            abort(404, 'Not Found');
+        }
+    }
+
 }

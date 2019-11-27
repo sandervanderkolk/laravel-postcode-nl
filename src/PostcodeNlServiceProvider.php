@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Speelpenning\PostcodeNl\Http\PostcodeNlClient;
 use Speelpenning\PostcodeNl\Services\AddressLookup;
 use Speelpenning\PostcodeNl\Validators\AddressLookupValidator;
+use Speelpenning\PostcodeNl\Services\Autocomplete;
+use Speelpenning\PostcodeNl\Validators\AutocompleteValidator;
 
 /**
  * Class PostcodeNlServiceProvider
@@ -39,6 +41,13 @@ class PostcodeNlServiceProvider extends ServiceProvider
         $this->app->singleton(AddressLookup::class, function ($app) {
             return new AddressLookup($app[AddressLookupValidator::class], $app[PostcodeNlClient::class]);
         });
+<<<<<<< HEAD
+=======
+
+        $this->app->singleton(Autocomplete::class, function ($app) {
+            return new Autocomplete($app[AutocompleteValidator::class], $app[PostcodeNlClient::class]);
+        });
+>>>>>>> added autocomplete support
     }
 
     /**
