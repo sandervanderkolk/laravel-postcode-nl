@@ -9,4 +9,9 @@ Route::group(['as' => 'postcode-nl::'], function () {
         'uses' => 'Speelpenning\PostcodeNl\Http\Controllers\AddressController@get'
     ]);
 
+    Route::get('postcode-nl/autocomplete/{context}/{term}/{language?}', [
+        'as' => 'autocomplete',
+        'uses' => 'Speelpenning\PostcodeNl\Http\Controllers\AddressController@autocomplete'
+    ]);
+
 });
