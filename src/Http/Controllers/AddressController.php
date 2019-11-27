@@ -10,6 +10,7 @@ use Speelpenning\PostcodeNl\Exceptions\AddressNotFound;
 use Speelpenning\PostcodeNl\Exceptions\Unauthorized;
 use Speelpenning\PostcodeNl\Services\AddressLookup;
 use Speelpenning\PostcodeNl\Services\Autocomplete;
+use Speelpenning\PostcodeNl\Services\AddressDetails;
 
 class AddressController extends Controller
 {
@@ -23,6 +24,11 @@ class AddressController extends Controller
      */
     protected $autocomplete;
 
+    /**
+     * @var AddressDetails
+     */
+    protected $addressDetails;
+
 
 
     /**
@@ -31,10 +37,11 @@ class AddressController extends Controller
      * @param AddressLookup $lookup
      * @param Autocomplete $autocomplete
      */
-    public function __construct(AddressLookup $lookup, Autocomplete $autocomplete)
+    public function __construct(AddressLookup $lookup, Autocomplete $autocomplete, AddressDetails $addressDetails)
     {
         $this->lookup = $lookup;
         $this->autocomplete = $autocomplete;
+        $this->addressDetails = $addressDetails;
     }
 
     /**
@@ -73,6 +80,30 @@ class AddressController extends Controller
     {
         try {
             $address = $this->autocomplete->autocomplete($context, $term, $language);
+            return response()->json($address);
+        } catch (ValidationException $e) {
+            abort(400, 'Bad Request');
+        } catch (Unauthorized $e) {
+            abort(401, 'Unauthorized');
+        } catch (AccountSuspended $e) {
+            abort(403, 'Account suspended');
+        } catch (AddressNotFound $e) {
+            abort(404, 'Not Found');
+        }
+    }
+
+    /**
+     * Gives address details based on given context
+     *
+     * @param string $context
+     * @param string $term
+     * @param null|string $language
+     * @return JsonResponse
+     */
+    public function getDetails(string $sessionToken, string $context): JsonResponse
+    {
+        try {
+            $address = $this->addressDetails->getDetails($sessionToken, $context);
             return response()->json($address);
         } catch (ValidationException $e) {
             abort(400, 'Bad Request');

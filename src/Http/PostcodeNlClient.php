@@ -44,7 +44,7 @@ class PostcodeNlClient
      * @throws AddressNotFound
      * @throws Unauthorized
      */
-    public function get(string $uri, $sessionToken): ResponseInterface
+    public function get(string $uri, $sessionToken = null): ResponseInterface
     {
         try {
             return $this->client->get($uri, $this->getRequestOptions($sessionToken));
